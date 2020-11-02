@@ -100,7 +100,7 @@
                                     },
                                     "persistent": {
                                         "type": "boolean",
-                                        "example": "true"
+                                        "example": true
                                     }
                                 },
                                 "type": "object"

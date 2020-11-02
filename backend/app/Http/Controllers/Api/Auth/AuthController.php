@@ -53,7 +53,7 @@ use App\Models\User;
  *       required={"email","password"},
  *       @OA\Property(property="email", type="string", format="email", example="user1@mail.com"),
  *       @OA\Property(property="password", type="string", format="password", example="PassWord12345"),
- *       @OA\Property(property="persistent", type="boolean", example="true"),
+ *       @OA\Property(property="persistent", type="boolean", example=true),
  *    ),
  * ),
  * @OA\Response(
@@ -132,23 +132,29 @@ class AuthController extends Controller
         $request->validate([
             'email' => 'required|string|email',
             'password' => 'required|string',
-            'remember_me' => 'boolean'
+            'persistent' => 'boolean'
         ]);
 
         $credentials = request(['email', 'password']);
 
-        if(!Auth::attempt($credentials))
-            return response()->json([
-                'message' => 'Unauthorized'
-            ], 401);
+        if(!Auth::attempt($credentials)) {
+            return response()->json(['message' => 'Unauthorized'], 401);
+        }
 
         $user = $request->user();
         $tokenResult = $user->createToken('Personal Access Token');
         $token = $tokenResult->token;
 
-        if ($request->remember_me)
+        if ($request->remember_me) {
             $token->expires_at = Carbon::now()->addWeeks(1);
-        $token->save();
+            $token->save();
+        }
+
+//        setcookie('access_token', $tokenResult->accessToken,
+//            Carbon::now()->addWeeks(1)->getTimestamp(),
+//            '/login',
+//            'http::/localhost:3000'
+//        );
 
         return response()->json([
             'access_token' => $tokenResult->accessToken,
