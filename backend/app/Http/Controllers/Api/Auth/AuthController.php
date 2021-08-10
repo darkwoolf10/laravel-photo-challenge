@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Auth\LoginRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
@@ -127,20 +128,15 @@ class AuthController extends Controller
      * @return [string] token_type
      * @return [string] expires_at
      */
-    public function login(Request $request)
+    public function login(LoginRequest $request)
     {
-        $request->validate([
-            'email' => 'required|string|email',
-            'password' => 'required|string',
-            'persistent' => 'boolean'
-        ]);
-
         $credentials = request(['email', 'password']);
 
-        if(!Auth::attempt($credentials)) {
+        if(!Auth::attempt($credentials)){
             return response()->json(['message' => 'Unauthorized'], 401);
         }
 
+        /** @var User $user */
         $user = $request->user();
         $tokenResult = $user->createToken('Personal Access Token');
         $token = $tokenResult->token;
@@ -150,19 +146,30 @@ class AuthController extends Controller
             $token->save();
         }
 
-//        setcookie('access_token', $tokenResult->accessToken,
-//            Carbon::now()->addWeeks(1)->getTimestamp(),
-//            '/login',
-//            'http::/localhost:3000'
-//        );
+        setcookie('access_token', $tokenResult->accessToken,
+            Carbon::now()->addWeeks(1)->getTimestamp(),
+            '/login',
+            'http::/localhost:3000'
+        );
 
         return response()->json([
+            'success' => true,
             'access_token' => $tokenResult->accessToken,
             'token_type' => 'Bearer',
             'expires_at' => Carbon::parse(
                 $tokenResult->token->expires_at
             )->toDateTimeString()
         ]);
+    }
+
+    /**
+     * Refresh a token.
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function refresh()
+    {
+        return $this->respondWithToken(auth()->refresh());
     }
 
     /**

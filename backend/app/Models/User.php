@@ -46,4 +46,20 @@ class User extends Authenticatable
     {
         return $this->hasMany(Challenge::class);
     }
+
+    /**
+     * @return string
+     */
+    public function getJWTIdentifier(): string
+    {
+        return $this->getKey();
+    }
+
+    /**
+     * @return array
+     */
+    public function getJWTCustomClaims(): array
+    {
+        return [];
+    }
 }

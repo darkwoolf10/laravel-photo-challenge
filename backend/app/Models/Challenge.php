@@ -6,6 +6,12 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
+/**
+ * Class Challenge
+ * @property string context
+ * @property bool status
+ * @package App\Models
+ */
 class Challenge extends Model
 {
     use HasFactory;
@@ -20,7 +26,7 @@ class Challenge extends Model
      */
     public function author(): BelongsTo
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(User::class, 'author_id');
     }
 
     /**
@@ -28,6 +34,6 @@ class Challenge extends Model
      */
     public function executor(): BelongsTo
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(User::class, 'executor_id');
     }
 }

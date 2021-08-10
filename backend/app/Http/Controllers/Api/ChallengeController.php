@@ -7,14 +7,20 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 
+/**
+ * Class ChallengeController
+ * @package App\Http\Controllers\Api
+ */
 class ChallengeController
 {
     /**
+     * @param Request $request
+     *
      * @return JsonResponse
      */
-    public function index(): JsonResponse
+    public function index(Request $request): JsonResponse
     {
-        $challenges = Challenge::all();
+        $challenges = Challenge::with(['author', 'executor'])->get();
 
         return response()->json($challenges);
     }
@@ -25,17 +31,18 @@ class ChallengeController
      */
     public function create(Request $request): JsonResponse
     {
-        $executor = User::find($request->input('executor'))->get();
-        $author = User::find($request->input('author'))->get();
+        $executor = User::query()->find($request->executor)->first();
+        //TODO::make get auth by jwt.
+        $author = User::query()->find($request->author)->first();
 
         $challenge = new Challenge();
-        $challenge->name = $request->input('name');
+        $challenge->context = $request->task;
         $challenge->executor()->associate($executor);
         $challenge->author()->associate($author);
         $challenge->save();
 
         return response()->json([
-            'status' => JsonResponse::$statusTexts['200'],
+            'message' => 'Challenge created',
         ]);
     }
 

@@ -179,7 +179,7 @@ return [
          * Include by me Service Providers
          */
         Laravel\Passport\PassportServiceProvider::class,
-
+        Tymon\JWTAuth\Providers\LaravelServiceProvider::class,
     ],
 
     /*

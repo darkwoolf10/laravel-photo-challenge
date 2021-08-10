@@ -16,20 +16,18 @@ class CreateChallengeTable extends Migration
         Schema::create('challenges', function (Blueprint $table) {
             $table->id();
             $table->string('context');
-            $table->bigInteger('author')->unsigned();
-            $table->bigInteger('executor')->unsigned();
+            $table->bigInteger('author_id')->unsigned();
+            $table->bigInteger('executor_id')->unsigned();
             $table->boolean('status')->default(0);
             $table->timestamps();
         });
 
         Schema::table('challenges', function (Blueprint $table) {
-            $table->foreign('executor')
+            $table->foreign('executor_id')
                 ->references('id')
                 ->on('users');
-        });
 
-        Schema::table('challenges', function (Blueprint $table) {
-            $table->foreign('author')
+            $table->foreign('author_id')
                 ->references('id')
                 ->on('users');
         });
