@@ -1,6 +1,6 @@
 .PHONY: go-back
 go-back: ## go inside backend container
-		docker exec -it app /bin/bash
+		docker exec -it pc_app /bin/bash
 
 .PHONY: go-front
 go-front: ## go inside php container
@@ -13,3 +13,4 @@ down: ## down all containers
 .PHONY: build
 build: ## build project
 		docker-compose up --build -d
+

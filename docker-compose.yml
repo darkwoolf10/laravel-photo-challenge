@@ -2,27 +2,27 @@ version: '3'
 services:
 
   #Nginx Service
-  webserver:
+  pc_webserver:
     image: nginx:alpine
-    container_name: webserver
+    container_name: pc_webserver
     restart: unless-stopped
     tty: true
     ports:
-      - "80:80"
-      - "443:443"
+      - "8080:80"
+      - "543:443"
     volumes:
       - ./backend/:/var/www
       - ./backend/nginx/conf.d/:/etc/nginx/conf.d/
     networks:
-      - app-network
+      - pc-network
 
   #PHP Service
-  app:
+  cp_app:
     build:
       context: ./backend
       dockerfile: Dockerfile
     image: digitalocean.com/php
-    container_name: app
+    container_name: pc_app
     restart: unless-stopped
     tty: true
     environment:
@@ -33,16 +33,16 @@ services:
       - ./backend/:/var/www
       - ./backend/php/local.ini:/usr/local/etc/php/conf.d/local.ini
     networks:
-      - app-network
+      - pc-network
 
   #MySQL Service
-  db:
+  pc_db:
     image: mysql:5.7.22
-    container_name: db
+    container_name: pc_db
     restart: unless-stopped
     tty: true
     ports:
-      - "3306:3306"
+      - "3307:3306"
     environment:
       MYSQL_DATABASE: root
       MYSQL_ROOT_PASSWORD: your_mysql_root_password
@@ -52,7 +52,7 @@ services:
       - ./backend/dbdata:/var/lib/mysql/
       - ./backend/mysql/my.cnf:/etc/mysql/my.cnf
     networks:
-      - app-network
+      - pc-network
 
   #Frontend on React.js
   frontend:
@@ -71,7 +71,7 @@ services:
 
 #Docker Networks
 networks:
-  app-network:
+  pc-network:
     driver: bridge
 #Volumes
 volumes:
