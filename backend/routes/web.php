@@ -30,7 +30,7 @@ Route::get('/redirect', function (Request $request) {
         'state' => $state,
     ]);
 
-    return redirect('http://localhost/oauth/authorize?'.$query);
+    return redirect('http://localhost:8080/oauth/authorize?'.$query);
 });
 
 Route::get('/dashboard', function () {

@@ -4,15 +4,19 @@ namespace App\Http\Controllers\Api;
 
 use App\Models\Challenge;
 use App\Models\User;
-use Illuminate\Http\Request;
+use App\Services\ChallengeService;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 
-/**
- * Class ChallengeController
- * @package App\Http\Controllers\Api
- */
 class ChallengeController
 {
+    private ChallengeService $challengeService;
+
+    public function __construct(ChallengeService $challengeService)
+    {
+        $this->challengeService = $challengeService;
+    }
+
     /**
      * @param Request $request
      *
@@ -31,9 +35,9 @@ class ChallengeController
      */
     public function create(Request $request): JsonResponse
     {
-        $executor = User::query()->find($request->executor)->first();
+        $executor = User::query()->findOrFail($request->executor);
         //TODO::make get auth by jwt.
-        $author = User::query()->find($request->author)->first();
+        $author = User::query()->findOrFail($request->author);
 
         $challenge = new Challenge();
         $challenge->context = $request->task;
@@ -46,9 +50,50 @@ class ChallengeController
         ]);
     }
 
-    public function show(): JsonResponse
+    /**
+     * @param int $id
+     * @return JsonResponse
+     */
+    public function show(int $id): JsonResponse
     {
-        //TODO::just do it
+        $challenges = Challenge::query()->with(['author', 'executor'])->find($id);
+
+        return response()->json($challenges);
+    }
+
+    /**
+     * @param Request $request
+     *
+     * @return JsonResponse
+     */
+    public function execute(Request $request): JsonResponse
+    {
+        $challenge = Challenge::query()->findOrFail($request->id);
+        $filename = time().'.'.request()->img->getClientOriginalExtension();
+        request()->img->move(public_path('images'), $filename);
+
+        $challenge->photo = $filename;
+        $challenge->save();
+
+        return response()->json([
+            'message' => 'Photo saved.',
+        ]);
+    }
+
+    /**
+     * @param Request $request
+     *
+     * @return JsonResponse
+     */
+    public function check(Request $request): JsonResponse
+    {
+        $challenge = Challenge::query()->findOrFail($request->challengeId);
+        $challenge->status = $request->status;
+        $challenge->save();
+
+        return response()->json([
+            'message' => $challenge->status,
+        ]);
     }
 
     public function edit(): JsonResponse
@@ -59,5 +104,21 @@ class ChallengeController
     public function delete(): JsonResponse
     {
         //TODO::just do it
+    }
+
+    /**
+     * @param Request $request
+     *
+     * @return JsonResponse
+     */
+    public function setPhoto(Request $request): JsonResponse
+    {
+        /** @var Challenge $challenge */
+        $challenge = Challenge::query()->findOrFail($request->challengeId);
+        $this->challengeService->savePhoto($challenge, $request);
+
+        return response()->json([
+            'message' => 'Save photo.',
+        ], 201);
     }
 }

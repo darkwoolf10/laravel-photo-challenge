@@ -19,7 +19,7 @@ class Challenge extends Model
     /**
      * @var string[]
      */
-    protected $fillable = ['context', 'status'];
+    protected $fillable = ['context', 'status', 'photo_url'];
 
     /**
      * @return BelongsTo

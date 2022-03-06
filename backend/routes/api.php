@@ -36,12 +36,14 @@ Route::group(['prefix' => 'challenge'], function () {
     Route::get('show/{id}', [ChallengeController::class, 'show'])->name('show-challenge');
     Route::put('edit/{id}', [ChallengeController::class, 'edit'])->name('edit-challenge');
     Route::delete('delete/{id}', [ChallengeController::class, 'delete'])->name('delete-challenge');
+    Route::post('set-photo', [ChallengeController::class, 'setPhoto'])->name('set-photo-challenge');
+    Route::post('check', [ChallengeController::class, 'check'])->name('check-challenge');
 });
 
 // AUTH
 Route::group(['prefix' => 'auth'], function () {
     Route::post('login', [AuthController::class, 'login']);
-    Route::post('registration', [AuthController::class, 'registration']);
+    Route::post('registration', [AuthController::class, 'signup']);
 
     Route::group(['middleware' => 'auth:api'], function() {
         Route::post('logout', [AuthController::class, 'logout']);
